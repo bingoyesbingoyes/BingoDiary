@@ -1,0 +1,1 @@
+yarn run icongenie generate -i src-electron/icons/diary.png

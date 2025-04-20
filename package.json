@@ -1,0 +1,38 @@
+{
+    "name": "bingo_diary",
+    "version": "0.0.3",
+    "description": "bingoyes' diary",
+    "productName": "Bingo Diary",
+    "author": "邱涵 <qiuhanCS@foxmail.com>",
+    "private": true,
+    "scripts": {
+        "test": "echo \"No test specified\" && exit 0",
+        "dev": "quasar dev",
+        "build": "quasar build"
+    },
+    "dependencies": {
+        "@popperjs/core": "^2.11.8",
+        "@quasar/extras": "^1.16.12",
+        "@vavt/rt-extension": "^1.3.0",
+        "@vavt/v3-extension": "^2.1.0",
+        "markdown-it": "^14.1.0",
+        "md-editor-v3": "^5.4.5",
+        "quasar": "^2.16.0",
+        "v-calendar": "^3.1.2",
+        "vue": "^3.4.18",
+        "vue-router": "^4.0.12"
+    },
+    "devDependencies": {
+        "@electron/packager": "^18.3.2",
+        "@quasar/app-vite": "^1.9.0",
+        "autoprefixer": "^10.4.2",
+        "electron": "^32.2.0",
+        "electron-builder": "^25.1.8",
+        "postcss": "^8.4.14"
+    },
+    "engines": {
+        "node": "^20 || ^18 || ^16",
+        "npm": ">= 6.13.4",
+        "yarn": ">= 1.21.1"
+    }
+}
