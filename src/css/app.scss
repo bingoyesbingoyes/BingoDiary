@@ -1,5 +1,38 @@
-// app global css in SCSS form
-// @font-face {
-//     font-family: 'Monospace';
-//     src: url('../assets/fonts/Monospace.ttf') format('truetype');
-// }
+/* Tailwind CSS */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles for transparent window */
+html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+}
+
+#app {
+    background: transparent;
+}
+
+/* Remove Windows blue focus outline */
+*:focus {
+    outline: none;
+}
+
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+}
+
+/* Remove default button styles on Windows */
+button {
+    outline: none;
+    border: none;
+}
+
+button::-moz-focus-inner {
+    border: 0;
+}

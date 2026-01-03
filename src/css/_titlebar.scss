@@ -1,0 +1,308 @@
+// Custom Titlebar
+.custom-titlebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    background: transparent;
+    z-index: 100;
+    -webkit-app-region: drag;
+
+    .titlebar-drag-region {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        -webkit-app-region: drag;
+    }
+
+    .window-controls {
+        display: flex;
+        gap: 8px;
+        z-index: 101;
+        -webkit-app-region: no-drag;
+
+        .control-btn {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.15s ease;
+
+            span {
+                display: none;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            &:hover span {
+                display: block;
+            }
+
+            &.close {
+                background: #ff5f57;
+                &:hover {
+                    background: #ff4136;
+                }
+                span::before {
+                    content: '×';
+                    font-size: 12px;
+                    font-weight: bold;
+                    color: #4a0000;
+                }
+            }
+
+            &.minimize {
+                background: #febc2e;
+                &:hover {
+                    background: #f5a623;
+                }
+                span::before {
+                    content: '−';
+                    font-size: 14px;
+                    font-weight: bold;
+                    color: #7a5500;
+                }
+            }
+
+            &.maximize {
+                background: #28c840;
+                &:hover {
+                    background: #1db954;
+                }
+                span::before {
+                    content: '+';
+                    font-size: 12px;
+                    font-weight: bold;
+                    color: #004a00;
+                }
+            }
+        }
+    }
+
+    .titlebar-title {
+        flex: 1;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.6);
+        pointer-events: none;
+    }
+
+    .titlebar-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 101;
+        -webkit-app-region: no-drag;
+    }
+
+    .sync-btn {
+        padding: 0;
+        margin: 0;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        -webkit-app-region: no-drag;
+    }
+
+    .menu-dropdown {
+        position: relative;
+
+        .menu-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            color: #666;
+
+            &:hover {
+                background: rgba(0, 0, 0, 0.1);
+                color: #333;
+            }
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            min-width: 160px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            z-index: 1000;
+
+            .dropdown-section {
+                padding: 8px 0;
+
+                .dropdown-label {
+                    padding: 4px 16px 8px;
+                    font-size: 11px;
+                    font-weight: 600;
+                    color: #999;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                button {
+                    display: block;
+                    width: 100%;
+                    padding: 8px 16px;
+                    border: none;
+                    background: none;
+                    text-align: left;
+                    font-size: 13px;
+                    color: #333;
+                    cursor: pointer;
+                    transition: background 0.15s;
+
+                    &:hover {
+                        background: rgba(0, 0, 0, 0.05);
+                    }
+                }
+            }
+
+            .dropdown-divider {
+                height: 1px;
+                background: rgba(0, 0, 0, 0.08);
+                margin: 0 12px;
+            }
+        }
+    }
+
+    .sync-btn {
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        color: #999;
+        opacity: 0.6;
+
+        &:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        &.connected {
+            color: #34a853;
+            opacity: 0.8;
+        }
+
+        &.syncing {
+            color: #4285f4;
+            opacity: 1;
+        }
+
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .settings-btn {
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    &.dark-mode {
+        .titlebar-title {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .menu-dropdown {
+            .menu-btn {
+                background: rgba(255, 255, 255, 0.08);
+                color: #a0a0a0;
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.15);
+                    color: #d8dee9;
+                }
+            }
+
+            .dropdown-content {
+                background: rgba(46, 52, 64, 0.95);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+                .dropdown-section {
+                    .dropdown-label {
+                        color: #666;
+                    }
+
+                    button {
+                        color: #d8dee9;
+
+                        &:hover {
+                            background: rgba(255, 255, 255, 0.08);
+                        }
+                    }
+                }
+
+                .dropdown-divider {
+                    background: rgba(255, 255, 255, 0.1);
+                }
+            }
+        }
+
+        .sync-btn {
+            color: #666;
+            &:hover {
+                background: rgba(255, 255, 255, 0.08);
+                color: #a0a0a0;
+            }
+            &.connected {
+                color: #34a853;
+            }
+            &.syncing {
+                color: #4285f4;
+            }
+        }
+
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.08);
+            &:hover {
+                background: rgba(255, 255, 255, 0.15);
+            }
+        }
+    }
+}

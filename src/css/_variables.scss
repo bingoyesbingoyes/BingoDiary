@@ -1,0 +1,44 @@
+// ============== Teal Color Scheme Variables ==============
+:root {
+    // Primary Teal Colors - Calm meditation green tone
+    --color-primary: #4A8B8B;
+    --color-primary-hover: #3D7A7A;
+    --color-primary-active: #336969;
+    --color-primary-light: #6BA8A8;
+    --color-primary-lighter: #9DC4C4;
+    --color-primary-alpha-10: rgba(74, 139, 139, 0.1);
+    --color-primary-alpha-20: rgba(74, 139, 139, 0.2);
+    --color-primary-alpha-30: rgba(74, 139, 139, 0.3);
+
+    // Backgrounds
+    --bg-main: #F8FAF9;
+    --bg-secondary: #EEF3F2;
+    --bg-card: rgba(255, 255, 255, 0.45);
+
+    // Event Categories
+    --event-meeting: #4A8B8B;
+    --event-hangout: #5A9A7A;
+    --event-cooking: #D4956A;
+    --event-other: #9E9E9E;
+    --event-weekend: #9B8AB8;
+
+    // Apple-style animation timing functions
+    --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+    --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+    --ease-in-out-quart: cubic-bezier(0.77, 0, 0.175, 1);
+
+    // Animation durations
+    --duration-fast: 0.2s;
+    --duration-normal: 0.35s;
+    --duration-slow: 0.5s;
+}
+
+.dark-mode {
+    --color-primary: #5A9B9B;
+    --color-primary-hover: #6BABAB;
+    --color-primary-active: #4A8B8B;
+    --color-primary-light: #7CBCBC;
+    --bg-main: #1A2424;
+    --bg-secondary: #243030;
+    --bg-card: rgba(30, 40, 40, 0.55);
+}

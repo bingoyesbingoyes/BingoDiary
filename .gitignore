@@ -3,6 +3,17 @@
 node_modules
 release
 diaries.json
+dist
+target
+src-tauri/target
+src-tauri/gen
+AAA
+*.apk
+*.aab
+*.keystore
+*.jks
+snapshot.txt
+snapshot*.txt
 
 # Quasar core related directories
 .quasar
@@ -33,3 +44,7 @@ yarn-error.log*
 
 # local .env files
 .env.local*
+
+
+日志.md
+/utils

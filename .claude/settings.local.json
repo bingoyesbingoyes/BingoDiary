@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yarn run dev)",
+      "Bash(npm run tauri:*)",
+      "Bash(npx tauri android init:*)",
+      "Bash(npm install @tauri-apps/plugin-os)",
+      "Bash(adb:*)",
+      "Bash(emulator:*)",
+      "Bash(npx tauri android dev:*)",
+      "Bash(npx tauri android build:*)",
+      "WebSearch",
+      "WebFetch(domain:v2.tauri.app)",
+      "Bash(keytool:*)",
+      "Bash(zip:*)",
+      "Bash(npm run dev)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(cat:*)",
+      "Bash(npx tauri icon:*)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(LC_ALL=C grep:*)",
+      "Bash(npm run build:frontend:*)",
+      "Bash(wc:*)",
+      "Bash(python3:*)",
+      "Bash(pip3 install:*)",
+      "Bash(npx sharp-cli:*)",
+      "Bash(node -e:*)",
+      "Bash(ls:*)",
+      "Bash(cargo check:*)",
+      "Bash(gzip:*)"
+    ]
+  }
+}

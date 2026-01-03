@@ -1,8 +1,10 @@
 <template>
-    <router-view />
+    <Index />
 </template>
 
 <script setup>
+import Index from './pages/Index.vue'
+
 defineOptions({
     name: "App",
 });
