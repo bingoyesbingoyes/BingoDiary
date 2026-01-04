@@ -81,35 +81,7 @@
             </div>
         </div>
 
-        <!-- Sync Settings -->
-        <div class="settings-section" v-if="clientId && status.connected">
-            <h3>{{ t('sync.syncSettings') }}</h3>
-            <div class="sync-option">
-                <label>
-                    <input
-                        type="checkbox"
-                        :checked="settings.enabled"
-                        @change="updateSetting('enabled', $event.target.checked)"
-                    />
-                    {{ t('sync.enableAutoSync') }}
-                </label>
-            </div>
-            <div class="sync-option" v-if="settings.enabled">
-                <label>{{ t('sync.syncInterval') }}</label>
-                <select
-                    :value="settings.syncIntervalMinutes"
-                    @change="updateSetting('syncIntervalMinutes', parseInt($event.target.value))"
-                    class="interval-select"
-                >
-                    <option :value="5">{{ t('sync.every5min') }}</option>
-                    <option :value="15">{{ t('sync.every15min') }}</option>
-                    <option :value="30">{{ t('sync.every30min') }}</option>
-                    <option :value="60">{{ t('sync.everyHour') }}</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Manual Sync -->
+        <!-- Sync -->
         <div class="settings-section" v-if="clientId && status.connected">
             <h3>{{ t('sync.manualSync') }}</h3>
             <div class="sync-status-row">
@@ -196,11 +168,6 @@ const status = ref({
     error: null,
     accountEmail: null
 });
-const settings = ref({
-    enabled: false,
-    syncMode: 'manual',
-    syncIntervalMinutes: 15
-});
 const connecting = ref(false);
 const syncError = ref(null);
 const syncResult = ref(null);
@@ -219,7 +186,6 @@ onMounted(async () => {
     });
     await loadClientId();
     await loadStatus();
-    await loadSettings();
 });
 
 onUnmounted(() => {
@@ -241,14 +207,6 @@ const loadStatus = async () => {
         status.value = await invoke('get_sync_status');
     } catch (e) {
         console.error('Failed to load sync status:', e);
-    }
-};
-
-const loadSettings = async () => {
-    try {
-        settings.value = await invoke('get_sync_settings');
-    } catch (e) {
-        console.error('Failed to load sync settings:', e);
     }
 };
 
@@ -398,15 +356,6 @@ const disconnect = async () => {
         syncResult.value = null;
     } catch (e) {
         syncError.value = `Disconnect failed: ${e}`;
-    }
-};
-
-const updateSetting = async (key, value) => {
-    settings.value[key] = value;
-    try {
-        await invoke('save_sync_settings', { settings: settings.value });
-    } catch (e) {
-        console.error('Failed to save settings:', e);
     }
 };
 
@@ -768,26 +717,6 @@ const getProgressPercent = (progress) => {
     border-radius: 4px;
     font-size: 0.85rem;
     cursor: pointer;
-}
-
-.sync-option {
-    margin-bottom: 0.75rem;
-}
-
-.sync-option label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.interval-select {
-    padding: 0.35rem 0.5rem;
-    border: 1px solid rgba(128, 128, 128, 0.3);
-    border-radius: 4px;
-    font-size: 0.85rem;
-    background: rgba(255, 255, 255, 0.1);
-    margin-left: 0.5rem;
 }
 
 .sync-status-row {

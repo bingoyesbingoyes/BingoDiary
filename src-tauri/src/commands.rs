@@ -138,6 +138,9 @@ pub async fn export_pdf(app: AppHandle) -> Result<(), String> {
     use tauri_plugin_dialog::{DialogExt, FilePath};
     use crate::pdf;
 
+    // Get diary directory for resolving relative image paths
+    let diary_dir = config::get_diary_dir(&app).await?;
+
     // Get all diaries
     let diaries = get_all_diaries(app.clone()).await?;
 
@@ -178,7 +181,7 @@ pub async fn export_pdf(app: AppHandle) -> Result<(), String> {
         .blocking_save_file();
 
     if let Some(FilePath::Path(path)) = file_path {
-        pdf::export_to_pdf(&markdown, &path)?;
+        pdf::export_to_pdf(&markdown, &path, Some(&diary_dir))?;
     }
 
     Ok(())

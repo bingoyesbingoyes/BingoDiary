@@ -45,6 +45,5 @@ yarn-error.log*
 # local .env files
 .env.local*
 
-
 日志.md
-/utils
+utils/

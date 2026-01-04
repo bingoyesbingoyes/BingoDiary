@@ -45,14 +45,29 @@ fn image_to_base64(path: &str) -> Option<String> {
 }
 
 /// Replace local image paths with base64 data URLs
-fn embed_images(content: &str) -> String {
-    let img_re = Regex::new(r"!\[([^\]]*)\]\((/[^)]+)\)").unwrap();
+fn embed_images(content: &str, base_dir: Option<&Path>) -> String {
+    // Match both absolute paths (/path/to/img) and relative paths (images/xxx.png)
+    let img_re = Regex::new(r"!\[([^\]]*)\]\(([^)]+)\)").unwrap();
 
     img_re.replace_all(content, |caps: &regex::Captures| {
         let alt = &caps[1];
-        let path = &caps[2];
+        let path_str = &caps[2];
 
-        match image_to_base64(path) {
+        // Skip URLs (http/https/data)
+        if path_str.starts_with("http://") || path_str.starts_with("https://") || path_str.starts_with("data:") {
+            return caps[0].to_string();
+        }
+
+        // Resolve relative paths using base_dir
+        let full_path = if path_str.starts_with('/') {
+            Path::new(path_str).to_path_buf()
+        } else if let Some(base) = base_dir {
+            base.join(path_str)
+        } else {
+            return caps[0].to_string();
+        };
+
+        match image_to_base64(full_path.to_str().unwrap_or("")) {
             Some(data_url) => format!("![{}]({})", alt, data_url),
             None => caps[0].to_string(), // Keep original if conversion fails
         }
@@ -138,7 +153,7 @@ fn preserve_line_breaks(content: &str) -> String {
 }
 
 /// Convert markdown to HTML
-fn markdown_to_html(markdown: &str) -> String {
+fn markdown_to_html(markdown: &str, base_dir: Option<&Path>) -> String {
     // Strip YAML frontmatter
     let content = strip_frontmatter(markdown);
 
@@ -146,7 +161,7 @@ fn markdown_to_html(markdown: &str) -> String {
     let content = preserve_line_breaks(content);
 
     // Embed local images as base64
-    let content = embed_images(&content);
+    let content = embed_images(&content, base_dir);
 
     // Process math expressions
     let processed = preprocess_math(&content);
@@ -178,11 +193,12 @@ fn get_styles() -> &'static str {
         color: #2c3e50;
         margin-top: 1.5em;
         margin-bottom: 0.5em;
+        page-break-after: avoid;
     }
     h1 { font-size: 2em; border-bottom: 2px solid #3498db; padding-bottom: 0.3em; }
     h2 { font-size: 1.5em; }
     h3 { font-size: 1.25em; }
-    p { margin: 0.8em 0; }
+    p { margin: 0.8em 0; page-break-inside: avoid; }
     code {
         background: #f5f5f5;
         padding: 0.2em 0.4em;
@@ -196,6 +212,7 @@ fn get_styles() -> &'static str {
         border-radius: 6px;
         overflow-x: auto;
         border: 1px solid #e0e0e0;
+        page-break-inside: avoid;
     }
     pre code { background: none; padding: 0; }
     blockquote {
@@ -204,6 +221,7 @@ fn get_styles() -> &'static str {
         padding: 0.5em 1em;
         background: #f9f9f9;
         color: #555;
+        page-break-inside: avoid;
     }
     blockquote p { margin: 0.3em 0; }
     table { border-collapse: collapse; width: 100%; margin: 1em 0; }
@@ -212,9 +230,16 @@ fn get_styles() -> &'static str {
     tr:nth-child(even) { background: #fafafa; }
     hr { border: none; border-top: 1px solid #ddd; margin: 2em 0; }
     ul, ol { padding-left: 2em; }
-    li { margin: 0.3em 0; }
+    li { margin: 0.3em 0; page-break-inside: avoid; }
     a { color: #3498db; text-decoration: none; }
-    img { max-width: 100%; }
+    img {
+        max-width: 100%;
+        max-height: 500px;
+        object-fit: contain;
+        page-break-inside: avoid;
+        display: block;
+        margin: 1em auto;
+    }
     .math-display { text-align: center; margin: 1.2em 0; font-size: 1.1em; }
     .math-error { color: #e74c3c; background: #fef0f0; }
     "#
@@ -247,9 +272,9 @@ fn create_html_document(content: &str) -> String {
 
 /// Export markdown to PDF using headless Chrome (Desktop only)
 #[cfg(not(target_os = "android"))]
-pub fn export_to_pdf(markdown: &str, output_path: &Path) -> Result<(), String> {
+pub fn export_to_pdf(markdown: &str, output_path: &Path, base_dir: Option<&Path>) -> Result<(), String> {
     // Convert markdown to HTML
-    let html_content = markdown_to_html(markdown);
+    let html_content = markdown_to_html(markdown, base_dir);
     let full_html = create_html_document(&html_content);
 
     // Create temporary HTML file
@@ -273,9 +298,11 @@ pub fn export_to_pdf(markdown: &str, output_path: &Path) -> Result<(), String> {
     tab.navigate_to(&file_url).map_err(|e| e.to_string())?;
     tab.wait_until_navigated().map_err(|e| e.to_string())?;
 
-    // Generate PDF with print_background enabled (required for math fraction lines)
+    // Generate PDF with A4 paper size and print_background enabled
     let pdf_options = PrintToPdfOptions {
         print_background: Some(true),
+        paper_width: Some(8.27),     // A4: 210mm
+        paper_height: Some(11.69),   // A4: 297mm
         margin_top: Some(0.78),      // ~20mm
         margin_bottom: Some(0.78),
         margin_left: Some(0.78),
@@ -294,6 +321,6 @@ pub fn export_to_pdf(markdown: &str, output_path: &Path) -> Result<(), String> {
 
 /// Export markdown to PDF - Android stub (not supported)
 #[cfg(target_os = "android")]
-pub fn export_to_pdf(_markdown: &str, _output_path: &Path) -> Result<(), String> {
+pub fn export_to_pdf(_markdown: &str, _output_path: &Path, _base_dir: Option<&Path>) -> Result<(), String> {
     Err("PDF export is not supported on Android".to_string())
 }
