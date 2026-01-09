@@ -6,8 +6,10 @@ diaries.json
 dist
 target
 src-tauri/target
-src-tauri/gen
-AAA
+src-tauri/gen/android/.gradle
+src-tauri/gen/android/build
+src-tauri/gen/android/app/build
+src-tauri/gen/android/app/.cxx
 *.apk
 *.aab
 *.keystore
@@ -44,6 +46,3 @@ yarn-error.log*
 
 # local .env files
 .env.local*
-
-日志.md
-utils/

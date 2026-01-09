@@ -634,6 +634,134 @@ impl SyncEngine {
     }
 }
 
+impl SyncEngine {
+    /// Force upload all local files to cloud, overwriting remote versions
+    pub async fn force_upload_sync(&self, access_token: &str) -> Result<SyncReport, String> {
+        let start_time = std::time::Instant::now();
+        let mut report = SyncReport::default();
+
+        println!("[Sync] Starting FORCE UPLOAD sync...");
+
+        self.app.emit("sync-started", ()).ok();
+        self.emit_progress("init", 0, 4, "Force uploading to cloud...");
+
+        let drive = DriveClient::new(access_token.to_string());
+        let mut metadata = SyncMetadata::load(&self.app).unwrap_or_default();
+
+        // Ensure folder structure
+        self.emit_progress("init", 1, 4, "Connecting to Google Drive...");
+        let (app_folder_id, entries_folder_id, images_folder_id) =
+            drive.ensure_folder_structure().await?;
+
+        metadata.drive_folder_id = Some(app_folder_id.clone());
+        metadata.entries_folder_id = Some(entries_folder_id.clone());
+        metadata.images_folder_id = Some(images_folder_id.clone());
+
+        // Force upload all diary entries
+        self.emit_progress("entries", 0, 1, "Uploading diary entries...");
+        let local_entries = self.get_local_entries().await?;
+        let remote_files = drive.list_files(&entries_folder_id).await?;
+        let remote_entries: HashMap<String, _> = remote_files
+            .into_iter()
+            .filter(|f| f.name.ends_with(".txt"))
+            .map(|f| (f.name.clone(), f))
+            .collect();
+
+        let total = local_entries.len() as u32;
+        for (i, (name, local_path)) in local_entries.iter().enumerate() {
+            let current = (i + 1) as u32;
+            self.emit_progress("entries", current, total, &format!("Uploading {}...", name));
+
+            let existing_id = remote_entries.get(name).map(|r| r.id.as_str());
+            match self.upload_entry(&drive, local_path, name, &entries_folder_id, existing_id, &mut metadata).await {
+                Ok(_) => report.uploaded.push(name.clone()),
+                Err(e) => report.errors.push(format!("Upload {} failed: {}", name, e)),
+            }
+        }
+
+        // Force upload tags.json
+        self.emit_progress("tags", 0, 1, "Uploading tags...");
+        let tags_path = self.diary_dir.join("tags.json");
+        if tags_path.exists() {
+            let content = fs::read(&tags_path).await
+                .map_err(|e| format!("Failed to read tags: {}", e))?;
+
+            let existing_tag = drive.find_file("tags.json", &app_folder_id).await?;
+            let result = drive.upload_content(
+                &content,
+                "tags.json",
+                &app_folder_id,
+                "application/json",
+                existing_tag.as_ref().map(|f| f.id.as_str()),
+            ).await?;
+
+            let hash = super::metadata::calculate_content_hash(&content);
+            let modified = get_file_modified_time(&tags_path).await?;
+            metadata.update_file_metadata("tags.json", &modified, Some(result.id), result.modified_time, &hash);
+            report.uploaded.push("tags.json".to_string());
+        }
+
+        // Force upload images
+        self.emit_progress("images", 0, 1, "Uploading images...");
+        let images_dir = self.diary_dir.join("images");
+        if images_dir.exists() {
+            let mut local_images: HashMap<String, PathBuf> = HashMap::new();
+            for entry in walkdir::WalkDir::new(&images_dir).max_depth(1) {
+                if let Ok(entry) = entry {
+                    let path = entry.path().to_path_buf();
+                    if path.is_file() {
+                        if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                            local_images.insert(name.to_string(), path);
+                        }
+                    }
+                }
+            }
+
+            let remote_images_list = drive.list_files(&images_folder_id).await?;
+            let remote_images: HashMap<String, _> = remote_images_list
+                .into_iter()
+                .map(|f| (f.name.clone(), f))
+                .collect();
+
+            let total = local_images.len() as u32;
+            for (i, (name, local_path)) in local_images.iter().enumerate() {
+                let current = (i + 1) as u32;
+                self.emit_progress("images", current, total, &format!("Uploading {}...", name));
+
+                let existing_id = remote_images.get(name).map(|r| r.id.as_str());
+                match drive.upload_file(local_path, name, &images_folder_id, existing_id).await {
+                    Ok(result) => {
+                        let hash = calculate_file_hash(local_path).unwrap_or_default();
+                        let modified = get_file_modified_time(local_path).await.unwrap_or_default();
+                        metadata.update_file_metadata(
+                            &format!("images/{}", name),
+                            &modified,
+                            Some(result.id),
+                            result.modified_time,
+                            &hash,
+                        );
+                        report.uploaded.push(format!("images/{}", name));
+                    }
+                    Err(e) => report.errors.push(format!("Upload image {} failed: {}", name, e)),
+                }
+            }
+        }
+
+        // Update sync time
+        metadata.update_last_sync_time();
+        metadata.save(&self.app).map_err(|e| e.to_string())?;
+
+        report.duration_ms = start_time.elapsed().as_millis() as u64;
+
+        println!("[Sync] Force upload completed in {}ms - uploaded: {}, errors: {}",
+            report.duration_ms, report.uploaded.len(), report.errors.len());
+
+        self.app.emit("sync-completed", &report).ok();
+
+        Ok(report)
+    }
+}
+
 async fn get_file_modified_time(path: &PathBuf) -> Result<String, String> {
     let metadata = fs::metadata(path).await
         .map_err(|e| format!("Failed to get file metadata: {}", e))?;

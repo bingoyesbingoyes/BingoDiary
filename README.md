@@ -27,11 +27,13 @@
 
 ## Overview | 概述
 
-Bingo Diary is a modern, privacy-focused diary application that runs entirely offline. Built with Tauri 2 and Rust, it offers exceptional performance with minimal resource usage. Features include Markdown editing with LaTeX math support, Google Drive sync, tag management, schedule events with alarms, and beautiful glassmorphism UI.
+**English**: Bingo Diary is a modern, privacy-focused diary application that runs entirely offline. Built with Tauri 2 and Rust backend, it offers exceptional performance with minimal resource usage. Features include Markdown editing with LaTeX math support, Google Drive sync, tag management, schedule events with alarms, and beautiful glassmorphism UI.
 
-Bingo Diary 是一款现代化、注重隐私的日记应用，完全离线运行。基于 Tauri 2 和 Rust 构建，提供卓越的性能和极低的资源占用。功能包括支持 LaTeX 数学公式的 Markdown 编辑、Google Drive 云同步、标签管理、带闹钟的日程事件，以及精美的毛玻璃 UI 设计。
+**中文**: Bingo Diary 是一款现代化、注重隐私的日记应用，完全离线运行。基于 Tauri 2 和 Rust 后端构建，提供卓越的性能和极低的资源占用。功能包括支持 LaTeX 数学公式的 Markdown 编辑、Google Drive 云同步、标签管理、带闹钟的日程事件，以及精美的毛玻璃 UI 设计。
 
-
+> *Migrated from Electron + Quasar to Tauri 2 + Rust for 95% smaller package size and 70% faster startup*
+>
+> *从 Electron + Quasar 迁移到 Tauri 2 + Rust，包体积减少 95%，启动速度提升 70%*
 
 ---
 
@@ -125,6 +127,23 @@ Bingo Diary 是一款现代化、注重隐私的日记应用，完全离线运�
 ---
 
 ## Installation | 安装
+
+### Pre-built Binaries | 预构建二进制文件
+
+Download from [Releases](../../releases):
+
+| Platform | File |
+|----------|------|
+| macOS (Apple Silicon) | `Bingo.Diary_x.x.x_aarch64.dmg` |
+| macOS (Intel) | `Bingo.Diary_x.x.x_x64.dmg` |
+| Windows | `Bingo.Diary_x.x.x_x64-setup.exe` |
+| Linux (Debian/Ubuntu) | `bingo-diary_x.x.x_amd64.deb` |
+| Linux (AppImage) | `bingo-diary_x.x.x_amd64.AppImage` |
+| Android | `app-universal-release.apk` |
+
+### Build from Source | 从源码构建
+
+#### Prerequisites | 前置要求
 
 - [Node.js](https://nodejs.org/) >= 18
 - [Rust](https://rustup.rs/) >= 1.70
@@ -295,7 +314,22 @@ Compared to the original Electron version | 与原 Electron 版本对比:
 
 ---
 
+## Screenshots | 截图
 
+<!-- Add your screenshots here | 在此添加截图 -->
+<!-- ![Main View](screenshots/main.png) -->
+<!-- ![Dark Mode](screenshots/dark.png) -->
+<!-- ![Mobile View](screenshots/mobile.png) -->
+
+---
+
+## Contributing | 贡献
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+欢迎贡献！请随时提交 Pull Request。
+
+---
 
 ## License | 许可证
 
@@ -305,7 +339,7 @@ Compared to the original Electron version | 与原 Electron 版本对比:
 
 ## Author | 作者
 
-**bingoyes** - [bingoyesbingoyes@gmail.com](mailto:bingoyesbingoyes@gmail.com)
+**BingoYes** - [qiuhanCS@foxmail.com](mailto:qiuhanCS@foxmail.com)
 
 ---
 

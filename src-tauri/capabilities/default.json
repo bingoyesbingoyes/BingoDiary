@@ -27,6 +27,8 @@
     "fs:allow-copy-file",
     "fs:allow-mkdir",
     "shell:allow-open",
+    "clipboard-manager:allow-read-image",
+    "clipboard-manager:allow-write-image",
     "os:allow-platform",
     "notification:default",
     "notification:allow-notify",

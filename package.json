@@ -1,6 +1,6 @@
 {
     "name": "bingo_diary",
-    "version": "2.0.1",
+    "version": "0.0.3",
     "description": "bingoyes' diary",
     "productName": "Bingo Diary",
     "author": "邱涵 <qiuhanCS@foxmail.com>",
@@ -14,8 +14,8 @@
         "tauri": "tauri"
     },
     "dependencies": {
-        "@popperjs/core": "^2.11.8",
         "@tauri-apps/api": "^2.9.1",
+        "@tauri-apps/plugin-clipboard-manager": "^2.3.2",
         "@tauri-apps/plugin-dialog": "^2.4.2",
         "@tauri-apps/plugin-fs": "^2.4.4",
         "@tauri-apps/plugin-notification": "^2.2.0",

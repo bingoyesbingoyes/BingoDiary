@@ -341,6 +341,21 @@ pub async fn start_sync(app: AppHandle) -> Result<SyncReport, String> {
 }
 
 #[tauri::command]
+pub async fn force_upload_sync(app: AppHandle) -> Result<SyncReport, String> {
+    let mut auth = sync::GoogleAuth::load(&app)?;
+
+    if !auth.is_authenticated() {
+        return Err("Not authenticated with Google".to_string());
+    }
+
+    let access_token = auth.get_valid_access_token().await?;
+    let diary_dir = config::get_diary_dir(&app).await?;
+
+    let engine = sync::SyncEngine::new(app.clone(), diary_dir);
+    engine.force_upload_sync(&access_token).await
+}
+
+#[tauri::command]
 pub async fn get_google_auth_url(is_mobile: bool, app: AppHandle) -> Result<String, String> {
     let auth = sync::GoogleAuth::load(&app)?;
     auth.get_auth_url(is_mobile).await

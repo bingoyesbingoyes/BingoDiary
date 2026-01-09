@@ -91,13 +91,23 @@
                 <div class="last-sync" v-else>
                     {{ t('sync.neverSynced') }}
                 </div>
-                <button
-                    @click="syncNow"
-                    class="sync-now-btn"
-                    :disabled="status.syncing"
-                >
-                    {{ status.syncing ? t('sync.syncing') : t('sync.syncNow') }}
-                </button>
+                <div class="sync-buttons">
+                    <button
+                        @click="syncNow"
+                        class="sync-now-btn"
+                        :disabled="status.syncing"
+                    >
+                        {{ status.syncing ? t('sync.syncing') : t('sync.syncNow') }}
+                    </button>
+                    <button
+                        @click="forceUpload"
+                        class="force-upload-btn"
+                        :disabled="status.syncing"
+                        :title="t('sync.forceUploadHint')"
+                    >
+                        {{ t('sync.forceUpload') }}
+                    </button>
+                </div>
             </div>
             <!-- Progress Bar -->
             <div v-if="syncProgress && status.syncing" class="sync-progress">
@@ -372,6 +382,30 @@ const syncNow = async () => {
         emit('sync-completed');
     } catch (e) {
         syncError.value = `Sync failed: ${e}`;
+    } finally {
+        status.value.syncing = false;
+        syncProgress.value = null;
+    }
+};
+
+const forceUpload = async () => {
+    // Confirm before force upload
+    if (!confirm(props.t('sync.forceUploadConfirm'))) {
+        return;
+    }
+
+    status.value.syncing = true;
+    syncError.value = null;
+    syncResult.value = null;
+    syncProgress.value = null;
+
+    try {
+        const result = await invoke('force_upload_sync');
+        syncResult.value = result;
+        await loadStatus();
+        emit('sync-completed');
+    } catch (e) {
+        syncError.value = `Force upload failed: ${e}`;
     } finally {
         status.value.syncing = false;
         syncProgress.value = null;
@@ -724,6 +758,32 @@ const getProgressPercent = (progress) => {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.sync-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.force-upload-btn {
+    padding: 0.5rem 0.75rem;
+    background: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: opacity 0.2s, background 0.2s;
+}
+
+.force-upload-btn:hover:not(:disabled) {
+    background: #f57c00;
+}
+
+.force-upload-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .last-sync {

@@ -179,6 +179,13 @@ const translations = {
     'sync.changeClientId': 'Change Client ID',
     'sync.linkCopied': 'Link copied to clipboard',
     'sync.authFailed': 'Authentication failed',
+    'sync.userCancelled': 'Authorization cancelled by user',
+    'sync.networkError': 'Network error, please check your connection',
+    'sync.deepLinkWaiting': 'Waiting for authorization...',
+    'sync.deepLinkTimeout': 'Authorization timeout, please try again or enter code manually',
+    'sync.forceUpload': 'Force Upload',
+    'sync.forceUploadHint': 'Upload all local files to cloud, overwriting remote versions',
+    'sync.forceUploadConfirm': 'This will overwrite all cloud data with local data. Are you sure?',
 
     // Time
     'time.justNow': 'Just now',
@@ -397,6 +404,9 @@ const translations = {
     'sync.changeClientId': '更改 Client ID',
     'sync.linkCopied': '链接已复制到剪贴板',
     'sync.authFailed': '认证失败',
+    'sync.forceUpload': '强制上传',
+    'sync.forceUploadHint': '将所有本地文件上传到云端，覆盖云端版本',
+    'sync.forceUploadConfirm': '这将用本地数据覆盖所有云端数据。确定要继续吗？',
 
     // Time
     'time.justNow': '刚刚',

@@ -299,13 +299,18 @@
                 <!-- Sync Button: Quick sync when connected, open settings when not -->
                 <button
                     class="settings-btn sync-btn"
-                    :class="{ 'syncing': syncStatus.syncing, 'connected': syncStatus.connected, 'just-synced': justSynced }"
+                    :class="{ 'syncing': syncStatus.syncing, 'connected': syncStatus.connected, 'just-synced': justSynced, 'sync-failed': syncFailed }"
                     @click="handleSyncClick"
-                    :title="syncStatus.connected ? (syncStatus.syncing ? 'Syncing...' : 'Sync Now') : 'Set up Sync'"
+                    :title="syncStatus.connected ? (syncStatus.syncing ? 'Syncing...' : syncFailed ? 'Sync Failed' : 'Sync Now') : 'Set up Sync'"
                 >
                     <!-- Success checkmark -->
                     <svg v-if="justSynced" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="sync-check">
                         <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <!-- Error X mark -->
+                    <svg v-else-if="syncFailed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="sync-error">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
                     </svg>
                     <!-- Cloud icon with spin animation when syncing -->
                     <svg v-else width="18" height="18" viewBox="0 0 24 24" :class="{ 'spinning': syncStatus.syncing }">
@@ -802,7 +807,8 @@ export default {
                 error: null,
                 accountEmail: null
             },
-            justSynced: false
+            justSynced: false,
+            syncFailed: false
         };
     },
     computed: {
@@ -1706,6 +1712,7 @@ export default {
 
             this.syncStatus.syncing = true;
             this.justSynced = false;
+            this.syncFailed = false;
             try {
                 await invoke('start_sync');
                 await this.loadSyncStatus();
@@ -1720,6 +1727,11 @@ export default {
                 }, 2000);
             } catch (error) {
                 console.error('Quick sync failed:', error);
+                // Show error X mark
+                this.syncFailed = true;
+                setTimeout(() => {
+                    this.syncFailed = false;
+                }, 3000);
             } finally {
                 this.syncStatus.syncing = false;
             }

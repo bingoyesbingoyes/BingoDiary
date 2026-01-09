@@ -31,7 +31,17 @@
       "Bash(node -e:*)",
       "Bash(ls:*)",
       "Bash(cargo check:*)",
-      "Bash(gzip:*)"
+      "Bash(gzip:*)",
+      "WebFetch(domain:docs.rs)",
+      "Bash(npm run dev:frontend:*)",
+      "Bash(npm run dev:*)",
+      "Bash(FLATTENER_BASE_DIR=/Users/user/Desktop/CODE/BingoDiary python3:*)",
+      "Bash(src-tauri/src/sync/metadata.rs )",
+      "Bash(src-tauri/src/sync/engine.rs )",
+      "Bash(src/components/SyncStatus.vue )",
+      "Bash(src/pages/Index.vue )",
+      "Bash(src/css/_titlebar.scss:*)",
+      "Bash(cargo build:*)"
     ]
   }
 }

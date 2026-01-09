@@ -221,12 +221,21 @@
             opacity: 1;
         }
 
+        &.sync-failed {
+            color: #ea4335;
+            opacity: 1;
+        }
+
         .spinning {
             animation: spin 1s linear infinite;
         }
 
         .sync-check {
             color: #34a853;
+        }
+
+        .sync-error {
+            color: #ea4335;
         }
     }
 
@@ -307,6 +316,9 @@
             }
             &.just-synced {
                 color: #34a853;
+            }
+            &.sync-failed {
+                color: #ea4335;
             }
         }
 

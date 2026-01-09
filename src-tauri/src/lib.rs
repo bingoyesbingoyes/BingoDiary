@@ -86,6 +86,7 @@ pub fn run() {
       // Sync commands
       commands::get_sync_status,
       commands::start_sync,
+      commands::force_upload_sync,
       commands::get_google_auth_url,
       commands::handle_oauth_callback,
       commands::disconnect_google,
