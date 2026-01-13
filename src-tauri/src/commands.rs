@@ -71,6 +71,35 @@ pub async fn export_json(app: AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub async fn export_json_range(start_date: String, end_date: String, app: AppHandle) -> Result<(), String> {
+    use tauri_plugin_dialog::{DialogExt, FilePath};
+
+    // Get all diaries and filter by date range
+    let diaries = get_all_diaries(app.clone()).await?;
+    let filtered: Vec<_> = diaries.into_iter()
+        .filter(|entry| entry.date >= start_date && entry.date <= end_date)
+        .collect();
+
+    let json_data = serde_json::to_string_pretty(&filtered)
+        .map_err(|e| format!("Failed to serialize: {}", e))?;
+
+    // Show save dialog with date range in filename
+    let file_path = app.dialog()
+        .file()
+        .set_title("Export diaries as JSON")
+        .set_file_name(&format!("diaries_{}_to_{}.json", start_date, end_date))
+        .add_filter("JSON Files", &["json"])
+        .blocking_save_file();
+
+    if let Some(FilePath::Path(path)) = file_path {
+        fs::write(path, json_data)
+            .map_err(|e| format!("Failed to write file: {}", e))?;
+    }
+
+    Ok(())
+}
+
+#[tauri::command]
 pub async fn import_json(app: AppHandle) -> Result<String, String> {
     use tauri_plugin_dialog::{DialogExt, FilePath};
 
@@ -177,6 +206,63 @@ pub async fn export_pdf(app: AppHandle) -> Result<(), String> {
         .file()
         .set_title("Export diaries as PDF")
         .set_file_name("diaries.pdf")
+        .add_filter("PDF Files", &["pdf"])
+        .blocking_save_file();
+
+    if let Some(FilePath::Path(path)) = file_path {
+        pdf::export_to_pdf(&markdown, &path, Some(&diary_dir))?;
+    }
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn export_pdf_range(start_date: String, end_date: String, app: AppHandle) -> Result<(), String> {
+    use tauri_plugin_dialog::{DialogExt, FilePath};
+    use crate::pdf;
+
+    // Get diary directory for resolving relative image paths
+    let diary_dir = config::get_diary_dir(&app).await?;
+
+    // Get all diaries and filter by date range
+    let diaries = get_all_diaries(app.clone()).await?;
+    let filtered: Vec<_> = diaries.into_iter()
+        .filter(|entry| entry.date >= start_date && entry.date <= end_date)
+        .collect();
+
+    // Build markdown content (oldest first)
+    let mut markdown = String::new();
+    let mut valid_entries: Vec<_> = filtered.iter().filter_map(|entry| {
+        let mut content = entry.content.clone();
+        let first_line = content.lines().next().unwrap_or("").trim();
+
+        // Remove date from first line if present
+        if first_line == entry.date || first_line.chars().all(|c| c.is_ascii_digit() || c == '-') {
+            content = content.lines().skip(1).collect::<Vec<_>>().join("\n").trim().to_string();
+        }
+
+        if content.is_empty() {
+            None
+        } else {
+            Some((entry.date.clone(), content))
+        }
+    }).collect();
+    valid_entries.reverse(); // Sort oldest first for export
+
+    let total = valid_entries.len();
+    for (i, (date, content)) in valid_entries.into_iter().enumerate() {
+        markdown.push_str(&format!("## {}\n\n{}\n\n", date, content));
+        // Add separator between entries, but not after the last one
+        if i < total - 1 {
+            markdown.push_str("---\n\n");
+        }
+    }
+
+    // Show save dialog with date range in filename
+    let file_path = app.dialog()
+        .file()
+        .set_title("Export diaries as PDF")
+        .set_file_name(&format!("diaries_{}_to_{}.pdf", start_date, end_date))
         .add_filter("PDF Files", &["pdf"])
         .blocking_save_file();
 

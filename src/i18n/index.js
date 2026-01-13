@@ -209,6 +209,15 @@ const translations = {
 
     // Export
     'export.exporting': 'Exporting {type}...',
+    'export.rangeExport': 'Range Export',
+    'export.thisWeek': 'This Week',
+    'export.thisMonth': 'This Month',
+    'export.startDate': 'Start Date',
+    'export.endDate': 'End Date',
+    'export.format': 'Format',
+    'export.export': 'Export',
+    'export.entriesInRange': '{count} entries in range',
+    'export.noEntriesInRange': 'No entries in selected range',
 
     // Alerts
     'alert.settingsSaved': 'Settings saved!',
@@ -430,6 +439,15 @@ const translations = {
 
     // Export
     'export.exporting': '正在导出 {type}...',
+    'export.rangeExport': '按范围导出',
+    'export.thisWeek': '本周',
+    'export.thisMonth': '本月',
+    'export.startDate': '开始日期',
+    'export.endDate': '结束日期',
+    'export.format': '格式',
+    'export.export': '导出',
+    'export.entriesInRange': '范围内有 {count} 篇日记',
+    'export.noEntriesInRange': '所选范围内没有日记',
 
     // Alerts
     'alert.settingsSaved': '设置已保存！',

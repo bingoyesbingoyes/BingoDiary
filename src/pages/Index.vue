@@ -338,6 +338,7 @@
                             <button @click="exportJSON">{{ t('menu.json') }}</button>
                             <button v-if="!isMobile" @click="exportToPDF">{{ t('menu.pdf') }}</button>
                             <button @click="exportToMarkdown">{{ t('menu.markdown') }}</button>
+                            <button @click="openExportModal" class="range-export-btn">{{ t('export.rangeExport') }}</button>
                         </div>
                         <div class="dropdown-divider"></div>
                         <div class="dropdown-section">
@@ -662,6 +663,63 @@
         @open-settings="openSettings"
     />
 
+    <!-- Export Range Modal -->
+    <div v-if="showExportModal" class="export-modal-overlay" @click.self="showExportModal = false">
+        <div class="export-modal" :class="{ 'dark-mode': darkTheme }">
+            <div class="export-modal-header">
+                <h2>{{ t('export.rangeExport') }}</h2>
+                <button @click="showExportModal = false" class="close-btn">×</button>
+            </div>
+            <div class="export-modal-content">
+                <!-- Quick Select Buttons -->
+                <div class="export-quick-select">
+                    <button @click="setExportThisWeek" :class="{ active: isThisWeekSelected }">
+                        {{ t('export.thisWeek') }}
+                    </button>
+                    <button @click="setExportThisMonth" :class="{ active: isThisMonthSelected }">
+                        {{ t('export.thisMonth') }}
+                    </button>
+                </div>
+
+                <!-- Date Range Inputs -->
+                <div class="export-date-range">
+                    <div class="date-input-group">
+                        <label>{{ t('export.startDate') }}</label>
+                        <input type="date" v-model="exportRangeStart" />
+                    </div>
+                    <div class="date-input-group">
+                        <label>{{ t('export.endDate') }}</label>
+                        <input type="date" v-model="exportRangeEnd" />
+                    </div>
+                </div>
+
+                <!-- Entry Count Preview -->
+                <div class="export-entry-count" v-if="exportRangeStart && exportRangeEnd">
+                    {{ entriesInRangeCount > 0 ? t('export.entriesInRange', { count: entriesInRangeCount }) : t('export.noEntriesInRange') }}
+                </div>
+
+                <!-- Format Selection -->
+                <div class="export-format-select">
+                    <label>{{ t('export.format') }}</label>
+                    <div class="format-options">
+                        <button @click="exportFormat = 'json'" :class="{ active: exportFormat === 'json' }">JSON</button>
+                        <button v-if="!isMobile" @click="exportFormat = 'pdf'" :class="{ active: exportFormat === 'pdf' }">PDF</button>
+                        <button @click="exportFormat = 'markdown'" :class="{ active: exportFormat === 'markdown' }">Markdown</button>
+                    </div>
+                </div>
+
+                <!-- Export Button -->
+                <button
+                    class="export-btn"
+                    @click="exportWithRange"
+                    :disabled="!exportRangeStart || !exportRangeEnd || entriesInRangeCount === 0"
+                >
+                    {{ t('export.export') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Export Loading Overlay (outside main-wrapper for proper fixed positioning) -->
     <div v-if="isExporting" class="export-overlay" :class="{ 'dark-theme': darkTheme }">
         <div class="export-spinner-container">
@@ -773,6 +831,11 @@ export default {
             // Export loading state
             isExporting: false,
             exportType: '',
+            // Export range modal
+            showExportModal: false,
+            exportRangeStart: '',
+            exportRangeEnd: '',
+            exportFormat: 'json',
             // Mobile platform detection
             isMobile: false,
             drawerOpen: false,
@@ -982,6 +1045,21 @@ export default {
                 }
             }
             return attrs;
+        },
+        // Export range computed properties
+        entriesInRangeCount() {
+            if (!this.exportRangeStart || !this.exportRangeEnd) return 0;
+            return this.entries.filter(entry =>
+                entry.date >= this.exportRangeStart && entry.date <= this.exportRangeEnd
+            ).length;
+        },
+        isThisWeekSelected() {
+            const { start, end } = this.getThisWeekRange();
+            return this.exportRangeStart === start && this.exportRangeEnd === end;
+        },
+        isThisMonthSelected() {
+            const { start, end } = this.getThisMonthRange();
+            return this.exportRangeStart === start && this.exportRangeEnd === end;
         }
     },
     watch: {
@@ -1277,6 +1355,147 @@ export default {
         },
         toggleSplitMode() {
             this.isSplitMode = !this.isSplitMode;
+        },
+        // Export range modal methods
+        openExportModal() {
+            this.showMenuDropdown = false;
+            this.setExportThisWeek(); // Default to this week
+            this.showExportModal = true;
+        },
+        getThisWeekRange() {
+            const today = new Date();
+            const dayOfWeek = today.getDay(); // 0 = Sunday
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - dayOfWeek);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            return {
+                start: this.getFormattedDate(startOfWeek),
+                end: this.getFormattedDate(endOfWeek)
+            };
+        },
+        getThisMonthRange() {
+            const today = new Date();
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+            return {
+                start: this.getFormattedDate(startOfMonth),
+                end: this.getFormattedDate(endOfMonth)
+            };
+        },
+        setExportThisWeek() {
+            const { start, end } = this.getThisWeekRange();
+            this.exportRangeStart = start;
+            this.exportRangeEnd = end;
+        },
+        setExportThisMonth() {
+            const { start, end } = this.getThisMonthRange();
+            this.exportRangeStart = start;
+            this.exportRangeEnd = end;
+        },
+        async exportWithRange() {
+            this.showExportModal = false;
+            this.isExporting = true;
+            this.exportType = this.exportFormat.toUpperCase();
+
+            try {
+                if (this.exportFormat === 'json') {
+                    await invoke('export_json_range', {
+                        startDate: this.exportRangeStart,
+                        endDate: this.exportRangeEnd
+                    });
+                } else if (this.exportFormat === 'pdf') {
+                    await invoke('export_pdf_range', {
+                        startDate: this.exportRangeStart,
+                        endDate: this.exportRangeEnd
+                    });
+                    alert(this.t('alert.pdfExportSuccess'));
+                } else if (this.exportFormat === 'markdown') {
+                    await this.exportMarkdownRange();
+                }
+            } catch (error) {
+                console.error('Export failed:', error);
+                if (error !== 'No file selected' && error !== 'cancelled') {
+                    alert('Export failed: ' + error);
+                }
+            } finally {
+                this.isExporting = false;
+                this.exportType = '';
+            }
+        },
+        async exportMarkdownRange() {
+            const { save } = await import('@tauri-apps/plugin-dialog');
+            const { writeFile, copyFile, mkdir, exists } = await import('@tauri-apps/plugin-fs');
+
+            // Filter entries by date range and sort oldest first
+            const filteredEntries = this.entries
+                .filter(entry => entry.date >= this.exportRangeStart && entry.date <= this.exportRangeEnd)
+                .sort((a, b) => a.date.localeCompare(b.date));
+
+            let markdownContent = '';
+            const imagePaths = new Set();
+
+            for (const entry of filteredEntries) {
+                let content = entry.content;
+                const firstLine = content.split('\n')[0].trim();
+
+                if (firstLine === entry.date || /^\d{4}-\d{2}-\d{2}$/.test(firstLine)) {
+                    content = content.split('\n').slice(1).join('\n').trim();
+                }
+
+                if (content) {
+                    markdownContent += `## ${entry.date}\n\n${content}\n\n---\n\n`;
+                    // Collect image paths
+                    const imgMatches = content.match(/!\[.*?\]\((images\/[^)]+)\)/g) || [];
+                    imgMatches.forEach(match => {
+                        const pathMatch = match.match(/\((images\/[^)]+)\)/);
+                        if (pathMatch) imagePaths.add(pathMatch[1]);
+                    });
+                }
+            }
+
+            // Remove trailing separator
+            markdownContent = markdownContent.replace(/---\n\n$/, '');
+
+            const filePath = await save({
+                title: 'Export Markdown',
+                defaultPath: `diaries_${this.exportRangeStart}_to_${this.exportRangeEnd}.md`,
+                filters: [{ name: 'Markdown', extensions: ['md'] }]
+            });
+
+            if (filePath) {
+                await writeFile(filePath, new TextEncoder().encode(markdownContent));
+
+                // Copy images if any
+                if (imagePaths.size > 0 && this.storagePath) {
+                    const exportDir = filePath.substring(0, filePath.lastIndexOf('/') || filePath.lastIndexOf('\\'));
+                    const imagesDir = `${exportDir}/images`;
+
+                    if (!(await exists(imagesDir))) {
+                        await mkdir(imagesDir, { recursive: true });
+                    }
+
+                    let copiedCount = 0;
+                    for (const imgPath of imagePaths) {
+                        try {
+                            const srcPath = `${this.storagePath}/${imgPath}`;
+                            const destPath = `${exportDir}/${imgPath}`;
+                            await copyFile(srcPath, destPath);
+                            copiedCount++;
+                        } catch (e) {
+                            console.error('Failed to copy image:', e);
+                        }
+                    }
+
+                    if (copiedCount > 0) {
+                        alert(this.t('alert.markdownExportImages', { count: copiedCount }));
+                    } else {
+                        alert(this.t('alert.markdownExportSuccess'));
+                    }
+                } else {
+                    alert(this.t('alert.markdownExportSuccess'));
+                }
+            }
         },
         async exportJSON() {
             this.showMenuDropdown = false;

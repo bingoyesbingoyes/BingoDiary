@@ -723,3 +723,285 @@
         transform: rotate(360deg);
     }
 }
+
+// Export Range Modal
+.export-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+}
+
+.export-modal {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 420px;
+    overflow: hidden;
+
+    &.dark-mode {
+        background: rgba(40, 44, 52, 0.95);
+
+        .export-modal-header {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+
+            h2 {
+                color: #e0e0e0;
+            }
+
+            .close-btn {
+                color: #888;
+
+                &:hover {
+                    color: #e0e0e0;
+                    background: rgba(255, 255, 255, 0.1);
+                }
+            }
+        }
+
+        .export-quick-select button {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.12);
+            }
+
+            &.active {
+                background: var(--color-primary);
+                border-color: var(--color-primary);
+                color: white;
+            }
+        }
+
+        .export-date-range {
+            label {
+                color: #aaa;
+            }
+
+            input {
+                background: rgba(255, 255, 255, 0.08);
+                border-color: rgba(255, 255, 255, 0.1);
+                color: #e0e0e0;
+
+                &:focus {
+                    border-color: var(--color-primary);
+                }
+            }
+        }
+
+        .export-entry-count {
+            color: #aaa;
+        }
+
+        .export-format-select {
+            label {
+                color: #aaa;
+            }
+
+            .format-options button {
+                background: rgba(255, 255, 255, 0.08);
+                border-color: rgba(255, 255, 255, 0.1);
+                color: #e0e0e0;
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.12);
+                }
+
+                &.active {
+                    background: var(--color-primary);
+                    border-color: var(--color-primary);
+                    color: white;
+                }
+            }
+        }
+    }
+}
+
+.export-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+    h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .close-btn {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 20px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+
+        &:hover {
+            background: rgba(0, 0, 0, 0.06);
+            color: #333;
+        }
+    }
+}
+
+.export-modal-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.export-quick-select {
+    display: flex;
+    gap: 12px;
+
+    button {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: #f8f8f8;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        transition: all 0.2s;
+
+        &:hover {
+            background: #f0f0f0;
+        }
+
+        &.active {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+    }
+}
+
+.export-date-range {
+    display: flex;
+    gap: 16px;
+
+    .date-input-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        input {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+
+            &:focus {
+                border-color: var(--color-primary);
+            }
+        }
+    }
+}
+
+.export-entry-count {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+}
+
+.export-format-select {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #666;
+    }
+
+    .format-options {
+        display: flex;
+        gap: 8px;
+
+        button {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f8f8f8;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            transition: all 0.2s;
+
+            &:hover {
+                background: #f0f0f0;
+            }
+
+            &.active {
+                background: var(--color-primary);
+                border-color: var(--color-primary);
+                color: white;
+            }
+        }
+    }
+}
+
+.export-btn {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 12px;
+    background: var(--color-primary);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+        background: var(--color-primary-hover);
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+// Range export button in dropdown
+.range-export-btn {
+    border-top: 1px solid rgba(0, 0, 0, 0.06) !important;
+    margin-top: 4px !important;
+    padding-top: 8px !important;
+}

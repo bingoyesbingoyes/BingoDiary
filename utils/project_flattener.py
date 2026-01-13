@@ -5,7 +5,7 @@ Project Flattener - Flatten and restore project files using .gitignore rules.
 Usage:
     python utils/project_flattener.py flatten -s . -o snapshot.json
     python utils/project_flattener.py flatten -s . -o snapshot.txt --base64  # Compressed, copyable
-    python utils/project_flattener.py restore -i snapshot.json -t ./restored
+    python utils/project_flattener.py restore -i snapshot.txt -t .
     python utils/project_flattener.py info -i snapshot.json
 """
 

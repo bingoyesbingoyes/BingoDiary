@@ -66,6 +66,7 @@ import { ref, computed, nextTick, watch, onMounted, onUnmounted } from 'vue';
 import { marked } from 'marked';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import mermaid from 'mermaid';
 import { invoke } from '@tauri-apps/api/core';
 import { convertFileSrc } from '@tauri-apps/api/core';
 import { platform } from '@tauri-apps/plugin-os';
@@ -490,10 +491,32 @@ const saveImage = async () => {
     }
 };
 
-// Configure marked for better rendering
+// Initialize mermaid
+const initMermaid = (isDark) => {
+    mermaid.initialize({
+        startOnLoad: false,
+        theme: isDark ? 'dark' : 'default',
+        securityLevel: 'loose',
+    });
+};
+
+// Configure marked with custom renderer for mermaid code blocks
+const renderer = new marked.Renderer();
+
+renderer.code = function({ text, lang }) {
+    if (lang === 'mermaid') {
+        const id = `mermaid-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+        return `<div class="mermaid-diagram" data-mermaid-id="${id}">${text}</div>`;
+    }
+    // Default code block rendering
+    const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<pre><code class="language-${lang || ''}">${escaped}</code></pre>`;
+};
+
 marked.setOptions({
     breaks: true,
     gfm: true,
+    renderer: renderer,
 });
 
 const renderedHtml = computed(() => {
@@ -571,6 +594,59 @@ const renderedHtml = computed(() => {
     });
 
     return html;
+});
+
+// Render mermaid diagrams after DOM update
+const renderMermaidDiagrams = async () => {
+    await nextTick();
+    const previewEl = previewRef.value;
+    if (!previewEl) return;
+
+    const mermaidDivs = previewEl.querySelectorAll('.mermaid-diagram:not(.mermaid-rendered)');
+    if (mermaidDivs.length === 0) return;
+
+    initMermaid(props.theme === 'dark');
+
+    for (const div of mermaidDivs) {
+        const code = div.textContent;
+        const id = div.getAttribute('data-mermaid-id');
+        try {
+            const { svg } = await mermaid.render(id, code);
+            div.innerHTML = svg;
+            div.classList.add('mermaid-rendered');
+        } catch (e) {
+            div.innerHTML = `<div class="mermaid-error">Mermaid Error: ${e.message}</div>`;
+            div.classList.add('mermaid-rendered');
+        }
+    }
+};
+
+// Watch for content changes to render mermaid
+watch(() => props.modelValue, () => {
+    if (!isSourceMode.value) {
+        renderMermaidDiagrams();
+    }
+});
+
+// Watch for mode changes
+watch(isSourceMode, (newVal) => {
+    if (!newVal) {
+        renderMermaidDiagrams();
+    }
+});
+
+// Watch for theme changes to re-render with correct theme
+watch(() => props.theme, () => {
+    if (!isSourceMode.value) {
+        // Reset rendered state to force re-render
+        const previewEl = previewRef.value;
+        if (previewEl) {
+            previewEl.querySelectorAll('.mermaid-rendered').forEach(el => {
+                el.classList.remove('mermaid-rendered');
+            });
+        }
+        renderMermaidDiagrams();
+    }
 });
 </script>
 
@@ -761,6 +837,26 @@ const renderedHtml = computed(() => {
         padding: 0.2em 0.5em;
         border-radius: 3px;
         font-size: 0.9em;
+    }
+
+    :deep(.mermaid-diagram) {
+        margin: 1em 0;
+        text-align: center;
+        overflow-x: auto;
+
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+    }
+
+    :deep(.mermaid-error) {
+        color: #d32f2f;
+        background: rgba(211, 47, 47, 0.1);
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        font-size: 0.9em;
+        margin: 1em 0;
     }
 
     .dark-theme & {

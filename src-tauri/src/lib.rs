@@ -55,6 +55,7 @@ pub fn run() {
       commands::get_all_diaries,
       commands::save_image,
       commands::export_json,
+      commands::export_json_range,
       commands::import_json,
       commands::export_images,
       commands::import_images,
@@ -62,6 +63,7 @@ pub fn run() {
       commands::change_storage_path,
       commands::get_app_data_dir,
       commands::export_pdf,
+      commands::export_pdf_range,
       // Settings commands
       commands::get_config,
       commands::save_config,
