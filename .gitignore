@@ -32,6 +32,8 @@ snapshot*.txt
 /src-capacitor/www
 /src-capacitor/node_modules
 
+/utils
+
 # Log files
 npm-debug.log*
 yarn-debug.log*
@@ -46,3 +48,5 @@ yarn-error.log*
 
 # local .env files
 .env.local*
+
+日志.md
