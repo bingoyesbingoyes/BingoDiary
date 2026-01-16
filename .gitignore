@@ -10,6 +10,7 @@ src-tauri/gen/android/.gradle
 src-tauri/gen/android/build
 src-tauri/gen/android/app/build
 src-tauri/gen/android/app/.cxx
+utils
 *.apk
 *.aab
 *.keystore
@@ -31,8 +32,6 @@ snapshot*.txt
 # Capacitor related directories and files
 /src-capacitor/www
 /src-capacitor/node_modules
-
-/utils
 
 # Log files
 npm-debug.log*

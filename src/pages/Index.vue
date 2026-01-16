@@ -223,6 +223,10 @@
                             <span class="shortcut-desc">{{ t('shortcuts.insertLink') }}</span>
                             <span class="shortcut-keys"><kbd>⌘</kbd><kbd>K</kbd></span>
                         </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">{{ t('shortcuts.cutLine') }}</span>
+                            <span class="shortcut-keys"><kbd>⌘</kbd><kbd>X</kbd></span>
+                        </div>
                     </div>
 
                     <div class="shortcuts-group">
@@ -2420,5 +2424,5 @@ export default {
 
 
 <style lang="scss">
-@import "../css/index.scss";
+@use "../css/index.scss";
 </style>

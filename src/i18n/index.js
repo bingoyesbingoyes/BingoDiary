@@ -68,6 +68,7 @@ const translations = {
     'shortcuts.bold': 'Bold',
     'shortcuts.italic': 'Italic',
     'shortcuts.insertLink': 'Insert Link',
+    'shortcuts.cutLine': 'Cut Line',
     'shortcuts.view': 'View',
     'shortcuts.togglePreview': 'Toggle Preview',
     'shortcuts.splitMode': 'Split Mode',
@@ -302,6 +303,7 @@ const translations = {
     'shortcuts.bold': '粗体',
     'shortcuts.italic': '斜体',
     'shortcuts.insertLink': '插入链接',
+    'shortcuts.cutLine': '剪切行',
     'shortcuts.view': '视图',
     'shortcuts.togglePreview': '切换预览',
     'shortcuts.splitMode': '分屏模式',
@@ -423,7 +425,7 @@ const translations = {
     'time.hoursAgo': '{count} 小时前',
 
     // Lock Screen
-    'lock.title': '冰果日记',
+    'lock.title': '缤果日记',
     'lock.enterPassword': '输入密码',
     'lock.unlock': '解锁',
 

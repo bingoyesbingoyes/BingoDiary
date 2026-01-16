@@ -203,6 +203,10 @@
                             <span class="shortcut-desc">Insert Link</span>
                             <span class="shortcut-keys"><kbd>⌘</kbd><kbd>K</kbd></span>
                         </div>
+                        <div class="shortcut-item">
+                            <span class="shortcut-desc">Cut Line</span>
+                            <span class="shortcut-keys"><kbd>⌘</kbd><kbd>X</kbd></span>
+                        </div>
                     </div>
 
                     <div class="shortcuts-group">
